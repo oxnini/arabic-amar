@@ -1,8 +1,21 @@
 import { google } from "googleapis";
+import fs from "fs";
+import path from "path";
 
 const DOC_ID = process.env.GOOGLE_DOC_ID!;
 
 function getAuth() {
+  const keyFilePath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+  if (keyFilePath) {
+    const resolvedPath = path.resolve(keyFilePath);
+    const credentials = JSON.parse(fs.readFileSync(resolvedPath, "utf-8"));
+    return new google.auth.GoogleAuth({
+      credentials,
+      scopes: ["https://www.googleapis.com/auth/documents.readonly"],
+    });
+  }
+
   return new google.auth.GoogleAuth({
     credentials: {
       client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
